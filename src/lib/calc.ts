@@ -1,7 +1,7 @@
 import type { Trade, TradeStats, Session } from "../types";
 
 export const GOLD_PIP_SIZE = 0.1;
-export const GOLD_PIP_VALUE_PER_LOT = 1;
+export const GOLD_PIP_VALUE_PER_LOT = 10;
 
 export function tradePips(t: Trade): number {
   const diff = t.direction === "long" ? t.exitPrice - t.entryPrice : t.entryPrice - t.exitPrice;
@@ -9,7 +9,7 @@ export function tradePips(t: Trade): number {
 }
 
 export function tradePnl(t: Trade): number {
-  return tradePips(t) * GOLD_PIP_VALUE_PER_LOT * t.lotSize - (t.commission ?? 0);
+  return tradePips(t) * GOLD_PIP_VALUE_PER_LOT * t.lotSize;
 }
 
 export function tradeRR(t: Trade): number | null {

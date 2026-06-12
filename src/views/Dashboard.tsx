@@ -24,7 +24,7 @@ export function Dashboard({ trades }: { trades: Trade[] }) {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Net P&L" value={fmt$(stats.totalPnl)} icon={DollarSign}
+        <StatCard label="P&L" value={fmt$(stats.totalPnl)} icon={DollarSign}
           tone={stats.totalPnl >= 0 ? "positive" : "negative"}
           hint={`${stats.totalTrades} trades`} />
         <StatCard label="Total Pips" value={`${stats.totalPips >= 0 ? "+" : ""}${stats.totalPips.toFixed(0)}`} icon={Zap}

@@ -92,7 +92,7 @@ export function NewTradeModal({ open, onClose, onSave }: Props) {
             <div className="text-lg font-bold text-slate-500 tabular-nums">—</div>
           </div>
           <div>
-            <div className="text-[10px] text-slate-400 uppercase tracking-wider">Net P&L</div>
+            <div className="text-[10px] text-slate-400 uppercase tracking-wider">P&L</div>
             <div className="text-lg font-bold text-slate-500 tabular-nums">—</div>
           </div>
           <div>
