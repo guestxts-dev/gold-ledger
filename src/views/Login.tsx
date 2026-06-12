@@ -13,8 +13,9 @@ export function Login() {
     e.preventDefault();
     setError("");
     setSubmitting(true);
-    const fn = mode === "signin" ? supabase.auth.signInWithPassword : supabase.auth.signUp;
-    const { error: err } = await fn({ email, password });
+    const { error: err } = await (mode === "signin"
+      ? supabase.auth.signInWithPassword({ email, password })
+      : supabase.auth.signUp({ email, password }));
     if (err) setError(err.message);
     setSubmitting(false);
   };
