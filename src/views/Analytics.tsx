@@ -25,7 +25,7 @@ export function Analytics({ trades }: { trades: Trade[] }) {
 
       <div className="grid lg:grid-cols-2 gap-6">
         <Panel title="P&L by Trading Session" subtitle="London, NY, Overlap, Asia — when do you print?">
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer width="100%" height={280} minWidth={0}>
             <BarChart data={bySession}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
               <XAxis dataKey="session" stroke="#64748b" fontSize={12} />
@@ -76,7 +76,7 @@ export function Analytics({ trades }: { trades: Trade[] }) {
         </Panel>
 
         <Panel title="Emotional Edge" subtitle="P&L by mindset at entry">
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer width="100%" height={280} minWidth={0}>
             <BarChart data={byEmo}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
               <XAxis dataKey="emotion" stroke="#64748b" fontSize={11} />
@@ -92,7 +92,7 @@ export function Analytics({ trades }: { trades: Trade[] }) {
         </Panel>
 
         <Panel title="Long vs Short Bias" subtitle="Are you over-trading one direction?">
-          <ResponsiveContainer width="100%" height={240}>
+          <ResponsiveContainer width="100%" height={240} minWidth={0}>
             <PieChart>
               <Pie
                 data={dirData}

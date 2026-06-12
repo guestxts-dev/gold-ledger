@@ -49,7 +49,7 @@ export function Dashboard({ trades }: { trades: Trade[] }) {
           </div>
         </div>
         <div className="h-64">
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
             <AreaChart data={curve}>
               <defs>
                 <linearGradient id="eq" x1="0" y1="0" x2="0" y2="1">
@@ -76,7 +76,7 @@ export function Dashboard({ trades }: { trades: Trade[] }) {
           <h2 className="text-white font-semibold mb-1">P&L by Day of Week</h2>
           <p className="text-xs text-slate-400 mb-4">When are you sharpest?</p>
           <div className="h-56">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height="100%" minWidth={0}>
               <BarChart data={dow}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
                 <XAxis dataKey="day" stroke="#64748b" fontSize={11} />
