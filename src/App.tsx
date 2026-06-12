@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { RotateCcw, Loader2, LogOut } from "lucide-react";
+import { RotateCcw, Loader2, LogOut, Settings } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
-import { supabase } from "./lib/supabase";
+import { supabase, supabaseConfigured } from "./lib/supabase";
 import { Sidebar, type View } from "./components/Sidebar";
 import { MobileNav } from "./components/MobileNav";
 import { NewTradeModal } from "./components/NewTradeModal";
@@ -12,9 +12,36 @@ import { Calendar } from "./views/Calendar";
 import { Login } from "./views/Login";
 import { useTrades } from "./lib/store";
 
+function ConfigError() {
+  return (
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+      <div className="max-w-md text-center">
+        <Settings className="w-12 h-12 text-amber-400 mx-auto mb-4" />
+        <h1 className="text-2xl font-bold text-white mb-2">Supabase Not Configured</h1>
+        <p className="text-slate-400 text-sm mb-6">
+          Set the <code className="text-emerald-400 bg-slate-900 px-1.5 py-0.5 rounded text-xs">VITE_SUPABASE_URL</code> and{" "}
+          <code className="text-emerald-400 bg-slate-900 px-1.5 py-0.5 rounded text-xs">VITE_SUPABASE_ANON_KEY</code>{" "}
+          environment variables in your Vercel project settings.
+        </p>
+        <ol className="text-left text-sm text-slate-400 space-y-2 bg-slate-900/60 rounded-xl p-5 border border-slate-800">
+          <li>1. Go to your Vercel project dashboard</li>
+          <li>2. Navigate to <strong className="text-white">Settings → Environment Variables</strong></li>
+          <li>3. Add both variables with your Supabase project values</li>
+          <li>4. Redeploy the project</li>
+        </ol>
+        <p className="text-xs text-slate-500 mt-6">
+          Need a Supabase project? Create one at <span className="text-emerald-400">supabase.com</span>
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+
+  if (!supabaseConfigured) return <ConfigError />;
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
