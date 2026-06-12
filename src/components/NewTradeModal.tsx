@@ -36,7 +36,7 @@ const strategies = [
   "Rounding Bottom",
   "Other",
 ];
-const emotions = ["Calm", "Confident", "Fomo", "Fearful", "Revenge", "Disciplined", "Bot", "Personal", "Aba Trades", "Apex Fx", "Coffie Fx", "UpDown Fx"];
+const emotions = ["Calm", "Confident", "Fomo", "Fearful", "Revenge", "Disciplined", "Bot", "Personal", "Aba Trades", "Aida Fx", "Apex Fx", "Coffie Fx", "UpDown Fx"];
 
 export function NewTradeModal({ open, onClose, onSave }: Props) {
   const nowLocal = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
