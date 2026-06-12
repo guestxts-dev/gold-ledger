@@ -4,17 +4,18 @@ export type Session = "Asia" | "London" | "NY" | "Overlap";
 
 export interface Trade {
   id: string;
-  pair: string; // always "XAUUSD" but kept for flexibility
+  pair: string;
   direction: Direction;
   entryPrice: number;
   exitPrice: number;
   lotSize: number;
   stopLoss?: number;
   takeProfit?: number;
-  entryTime: string; // ISO
-  exitTime: string;  // ISO
+  commission?: number;
+  entryTime: string;
+  exitTime: string;
   strategy: string;
-  emotion: "calm" | "confident" | "fomo" | "fearful" | "revenge" | "disciplined";
+  emotion: string;
   notes: string;
   screenshotUrl?: string;
 }

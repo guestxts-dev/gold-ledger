@@ -17,9 +17,26 @@ const strategies = [
   "News Spike (NFP/CPI)",
   "Asian Range Break",
   "ATH Continuation",
+  "Fibonacci",
+  "Support/Resistance",
+  "Candlestick",
+  "Flag/Pennant",
+  "Buy Zone",
+  "Sell Zone",
+  "News Buy",
+  "News Sell",
+  "Heads/Shoulders",
+  "Double Top/Bottom",
+  "Triangles",
+  "Cup & Handle",
+  "Trend Channels",
+  "Divergence",
+  "Breakouts",
+  "Overbought/Oversold",
+  "Rounding Bottom",
   "Other",
 ];
-const emotions: Trade["emotion"][] = ["calm", "confident", "fomo", "fearful", "revenge", "disciplined"];
+const emotions = ["calm", "confident", "fomo", "fearful", "revenge", "disciplined", "Bot", "Personal", "Aba Trades", "Apex", "Coffie", "UpDown"];
 
 export function NewTradeModal({ open, onClose, onSave }: Props) {
   const nowLocal = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
@@ -30,8 +47,6 @@ export function NewTradeModal({ open, onClose, onSave }: Props) {
     entryPrice: 2350.00,
     exitPrice: 2365.50,
     lotSize: 0.10,
-    stopLoss: 2342.00,
-    takeProfit: 2375.00,
     entryTime: nowLocal(),
     exitTime: nowLocal(),
     strategy: "London Open Breakout",
@@ -93,16 +108,19 @@ export function NewTradeModal({ open, onClose, onSave }: Props) {
               <input type="number" step="0.01" value={form.exitPrice} onChange={(e) => update("exitPrice", +e.target.value)} className={inputCls} />
             </Field>
             <Field label="Stop Loss">
-              <input type="number" step="0.01" value={form.stopLoss ?? ""} onChange={(e) => update("stopLoss", +e.target.value)} className={inputCls} />
+              <input type="text" inputMode="decimal" value={form.stopLoss ?? ""} onChange={(e) => update("stopLoss", e.target.value === "" ? undefined : +e.target.value)} className={inputCls} placeholder="—" />
             </Field>
             <Field label="Take Profit">
-              <input type="number" step="0.01" value={form.takeProfit ?? ""} onChange={(e) => update("takeProfit", +e.target.value)} className={inputCls} />
+              <input type="text" inputMode="decimal" value={form.takeProfit ?? ""} onChange={(e) => update("takeProfit", e.target.value === "" ? undefined : +e.target.value)} className={inputCls} placeholder="—" />
             </Field>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <Field label="Lot Size">
               <input type="number" step="0.01" value={form.lotSize} onChange={(e) => update("lotSize", +e.target.value)} className={inputCls} />
+            </Field>
+            <Field label="Commission $">
+              <input type="text" inputMode="decimal" value={form.commission ?? ""} onChange={(e) => update("commission", e.target.value === "" ? undefined : +e.target.value)} className={inputCls} placeholder="0" />
             </Field>
             <Field label="Entry Time">
               <input type="datetime-local" value={form.entryTime} onChange={(e) => update("entryTime", e.target.value)} className={inputCls} />
@@ -119,8 +137,8 @@ export function NewTradeModal({ open, onClose, onSave }: Props) {
               </select>
             </Field>
             <Field label="Emotion">
-              <select value={form.emotion} onChange={(e) => update("emotion", e.target.value as Trade["emotion"])} className={inputCls}>
-                {emotions.map((s) => <option key={s} value={s}>{s}</option>)}
+              <select value={form.emotion} onChange={(e) => update("emotion", e.target.value)} className={inputCls}>
+                {emotions.map((s) => <option key={s}>{s}</option>)}
               </select>
             </Field>
           </div>
@@ -131,8 +149,7 @@ export function NewTradeModal({ open, onClose, onSave }: Props) {
               className={inputCls + " resize-none"} />
           </Field>
 
-          {/* Live preview */}
-          <div className="grid grid-cols-4 gap-3 p-4 rounded-lg bg-slate-950/60 border border-slate-800">
+          <div className="grid grid-cols-5 gap-3 p-4 rounded-lg bg-slate-950/60 border border-slate-800">
             <div>
               <div className="text-[10px] text-slate-400 uppercase tracking-wider">Pips</div>
               <div className={`text-lg font-bold tabular-nums ${previewPips >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
@@ -140,7 +157,7 @@ export function NewTradeModal({ open, onClose, onSave }: Props) {
               </div>
             </div>
             <div>
-              <div className="text-[10px] text-slate-400 uppercase tracking-wider">P&L</div>
+              <div className="text-[10px] text-slate-400 uppercase tracking-wider">Net P&L</div>
               <div className={`text-lg font-bold tabular-nums ${previewPnl >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
                 {previewPnl >= 0 ? "+" : "-"}${Math.abs(previewPnl).toFixed(2)}
               </div>
@@ -155,6 +172,12 @@ export function NewTradeModal({ open, onClose, onSave }: Props) {
               <div className="text-[10px] text-slate-400 uppercase tracking-wider">Risk</div>
               <div className="text-lg font-bold text-rose-300 tabular-nums">
                 {previewRisk !== null ? `$${previewRisk.toFixed(2)}` : "—"}
+              </div>
+            </div>
+            <div>
+              <div className="text-[10px] text-slate-400 uppercase tracking-wider">Comm.</div>
+              <div className="text-lg font-bold text-slate-300 tabular-nums">
+                {form.commission ? `$${form.commission.toFixed(2)}` : "$0"}
               </div>
             </div>
           </div>

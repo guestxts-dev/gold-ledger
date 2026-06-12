@@ -1,11 +1,7 @@
 import type { Trade, TradeStats, Session } from "../types";
 
-// XAUUSD conventions:
-//  - 1 pip = $0.10 price move (i.e. price 1950.50 -> 1950.60 = 1 pip)
-//  - Pip value: $1 per pip per 1.0 standard lot (100 oz)
-//  - So a $10 price move on 1.0 lot = 100 pips = $1,000 P&L
 export const GOLD_PIP_SIZE = 0.1;
-export const GOLD_PIP_VALUE_PER_LOT = 1; // $ per pip per 1.0 lot
+export const GOLD_PIP_VALUE_PER_LOT = 1;
 
 export function tradePips(t: Trade): number {
   const diff = t.direction === "long" ? t.exitPrice - t.entryPrice : t.entryPrice - t.exitPrice;
@@ -13,7 +9,7 @@ export function tradePips(t: Trade): number {
 }
 
 export function tradePnl(t: Trade): number {
-  return tradePips(t) * GOLD_PIP_VALUE_PER_LOT * t.lotSize;
+  return tradePips(t) * GOLD_PIP_VALUE_PER_LOT * t.lotSize - (t.commission ?? 0);
 }
 
 export function tradeRR(t: Trade): number | null {
@@ -30,10 +26,8 @@ export function tradeRiskDollars(t: Trade): number | null {
   return riskPips * GOLD_PIP_VALUE_PER_LOT * t.lotSize;
 }
 
-// Determine session from UTC hour
 export function tradeSession(t: Trade): Session {
   const h = new Date(t.entryTime).getUTCHours();
-  // Asia: 23-07 UTC, London: 07-15 UTC, NY: 13-21 UTC, Overlap (London+NY): 13-15
   if (h >= 13 && h < 15) return "Overlap";
   if (h >= 7 && h < 13) return "London";
   if (h >= 13 && h < 21) return "NY";

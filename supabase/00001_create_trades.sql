@@ -10,10 +10,11 @@ CREATE TABLE trades (
   lot_size NUMERIC NOT NULL,
   stop_loss NUMERIC,
   take_profit NUMERIC,
+  commission NUMERIC DEFAULT 0,
   entry_time TIMESTAMPTZ NOT NULL,
   exit_time TIMESTAMPTZ NOT NULL,
   strategy TEXT NOT NULL,
-  emotion TEXT NOT NULL CHECK (emotion IN ('calm', 'confident', 'fomo', 'fearful', 'revenge', 'disciplined')),
+  emotion TEXT NOT NULL,
   notes TEXT DEFAULT '',
   screenshot_url TEXT,
   created_at TIMESTAMPTZ DEFAULT now()
