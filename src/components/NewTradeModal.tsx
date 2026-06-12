@@ -36,43 +36,117 @@ const strategies = [
   "Rounding Bottom",
   "Other",
 ];
-const emotions = ["calm", "confident", "fomo", "fearful", "revenge", "disciplined", "Bot", "Personal", "Aba Trades", "Apex", "Coffie", "UpDown"];
+const emotions = ["Calm", "Confident", "Fomo", "Fearful", "Revenge", "Disciplined", "Bot", "Personal", "Aba Trades", "Apex Fx", "Coffie Fx", "UpDown Fx"];
 
 export function NewTradeModal({ open, onClose, onSave }: Props) {
   const nowLocal = () => new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 
-  const [form, setForm] = useState<Omit<Trade, "id">>({
+  const [form, setForm] = useState({
     pair: "XAUUSD",
-    direction: "long",
-    entryPrice: 2350.00,
-    exitPrice: 2365.50,
+    direction: "long" as "long" | "short",
+    entryPrice: undefined as number | undefined,
+    exitPrice: undefined as number | undefined,
     lotSize: 0.10,
+    stopLoss: undefined as number | undefined,
+    takeProfit: undefined as number | undefined,
+    commission: undefined as number | undefined,
     entryTime: nowLocal(),
     exitTime: nowLocal(),
     strategy: "London Open Breakout",
-    emotion: "calm",
+    emotion: "Calm",
     notes: "",
   });
 
   if (!open) return null;
 
-  const previewPnl = tradePnl(form as Trade);
-  const previewPips = tradePips(form as Trade);
-  const previewRR = tradeRR(form as Trade);
-  const previewRisk = tradeRiskDollars(form as Trade);
+  const canPreview = form.entryPrice !== undefined && form.exitPrice !== undefined;
+  const previewPips = canPreview ? tradePips(form as unknown as Trade) : null;
+  const previewPnl = canPreview ? tradePnl(form as unknown as Trade) : null;
+  const previewRR = canPreview ? tradeRR(form as unknown as Trade) : null;
+  const previewRisk = canPreview ? tradeRiskDollars(form as unknown as Trade) : null;
 
   const update = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
     setForm((f) => ({ ...f, [k]: v }));
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (form.entryPrice === undefined || form.exitPrice === undefined) {
+      alert("Please fill in Entry and Exit prices.");
+      return;
+    }
     onSave({
-      ...form,
+      ...form as unknown as Omit<Trade, "id">,
       pair: "XAUUSD",
       entryTime: new Date(form.entryTime).toISOString(),
       exitTime: new Date(form.exitTime).toISOString(),
     });
     onClose();
+  };
+
+  const renderPreview = () => {
+    if (!canPreview) {
+      return (
+        <div className="grid grid-cols-5 gap-3 p-4 rounded-lg bg-slate-950/60 border border-slate-800">
+          <div>
+            <div className="text-[10px] text-slate-400 uppercase tracking-wider">Pips</div>
+            <div className="text-lg font-bold text-slate-500 tabular-nums">—</div>
+          </div>
+          <div>
+            <div className="text-[10px] text-slate-400 uppercase tracking-wider">Net P&L</div>
+            <div className="text-lg font-bold text-slate-500 tabular-nums">—</div>
+          </div>
+          <div>
+            <div className="text-[10px] text-slate-400 uppercase tracking-wider">R:R</div>
+            <div className="text-lg font-bold text-slate-500 tabular-nums">—</div>
+          </div>
+          <div>
+            <div className="text-[10px] text-slate-400 uppercase tracking-wider">Risk</div>
+            <div className="text-lg font-bold text-slate-500 tabular-nums">—</div>
+          </div>
+          <div>
+            <div className="text-[10px] text-slate-400 uppercase tracking-wider">Comm.</div>
+            <div className="text-lg font-bold text-slate-300 tabular-nums">
+              {form.commission ? `$${form.commission.toFixed(2)}` : "$0"}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-5 gap-3 p-4 rounded-lg bg-slate-950/60 border border-slate-800">
+        <div>
+          <div className="text-[10px] text-slate-400 uppercase tracking-wider">Pips</div>
+          <div className={`text-lg font-bold tabular-nums ${previewPips! >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+            {previewPips! >= 0 ? "+" : ""}{previewPips!.toFixed(1)}
+          </div>
+        </div>
+        <div>
+          <div className="text-[10px] text-slate-400 uppercase tracking-wider">Net P&L</div>
+          <div className={`text-lg font-bold tabular-nums ${previewPnl! >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+            {previewPnl! >= 0 ? "+" : "-"}${Math.abs(previewPnl!).toFixed(2)}
+          </div>
+        </div>
+        <div>
+          <div className="text-[10px] text-slate-400 uppercase tracking-wider">R:R</div>
+          <div className="text-lg font-bold text-slate-200 tabular-nums">
+            {previewRR ? `1:${previewRR.toFixed(1)}` : "—"}
+          </div>
+        </div>
+        <div>
+          <div className="text-[10px] text-slate-400 uppercase tracking-wider">Risk</div>
+          <div className="text-lg font-bold text-rose-300 tabular-nums">
+            {previewRisk !== null ? `$${previewRisk.toFixed(2)}` : "—"}
+          </div>
+        </div>
+        <div>
+          <div className="text-[10px] text-slate-400 uppercase tracking-wider">Comm.</div>
+          <div className="text-lg font-bold text-slate-300 tabular-nums">
+            {form.commission ? `$${form.commission.toFixed(2)}` : "$0"}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -102,16 +176,16 @@ export function NewTradeModal({ open, onClose, onSave }: Props) {
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <Field label="Entry $">
-              <input type="number" step="0.01" value={form.entryPrice} onChange={(e) => update("entryPrice", +e.target.value)} className={inputCls} />
+              <input type="number" step="0.01" value={form.entryPrice ?? ""} onChange={(e) => update("entryPrice", e.target.value === "" ? undefined : +e.target.value)} className={inputCls} placeholder="0.00" />
             </Field>
             <Field label="Exit $">
-              <input type="number" step="0.01" value={form.exitPrice} onChange={(e) => update("exitPrice", +e.target.value)} className={inputCls} />
+              <input type="number" step="0.01" value={form.exitPrice ?? ""} onChange={(e) => update("exitPrice", e.target.value === "" ? undefined : +e.target.value)} className={inputCls} placeholder="0.00" />
             </Field>
             <Field label="Stop Loss">
-              <input type="text" inputMode="decimal" value={form.stopLoss ?? ""} onChange={(e) => update("stopLoss", e.target.value === "" ? undefined : +e.target.value)} className={inputCls} placeholder="—" />
+              <input type="number" step="0.01" value={form.stopLoss ?? ""} onChange={(e) => update("stopLoss", e.target.value === "" ? undefined : +e.target.value)} className={inputCls} placeholder="—" />
             </Field>
             <Field label="Take Profit">
-              <input type="text" inputMode="decimal" value={form.takeProfit ?? ""} onChange={(e) => update("takeProfit", e.target.value === "" ? undefined : +e.target.value)} className={inputCls} placeholder="—" />
+              <input type="number" step="0.01" value={form.takeProfit ?? ""} onChange={(e) => update("takeProfit", e.target.value === "" ? undefined : +e.target.value)} className={inputCls} placeholder="—" />
             </Field>
           </div>
 
@@ -120,7 +194,7 @@ export function NewTradeModal({ open, onClose, onSave }: Props) {
               <input type="number" step="0.01" value={form.lotSize} onChange={(e) => update("lotSize", +e.target.value)} className={inputCls} />
             </Field>
             <Field label="Commission $">
-              <input type="text" inputMode="decimal" value={form.commission ?? ""} onChange={(e) => update("commission", e.target.value === "" ? undefined : +e.target.value)} className={inputCls} placeholder="0" />
+              <input type="number" step="0.01" value={form.commission ?? ""} onChange={(e) => update("commission", e.target.value === "" ? undefined : +e.target.value)} className={inputCls} placeholder="0" />
             </Field>
             <Field label="Entry Time">
               <input type="datetime-local" value={form.entryTime} onChange={(e) => update("entryTime", e.target.value)} className={inputCls} />
@@ -149,38 +223,7 @@ export function NewTradeModal({ open, onClose, onSave }: Props) {
               className={inputCls + " resize-none"} />
           </Field>
 
-          <div className="grid grid-cols-5 gap-3 p-4 rounded-lg bg-slate-950/60 border border-slate-800">
-            <div>
-              <div className="text-[10px] text-slate-400 uppercase tracking-wider">Pips</div>
-              <div className={`text-lg font-bold tabular-nums ${previewPips >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                {previewPips >= 0 ? "+" : ""}{previewPips.toFixed(1)}
-              </div>
-            </div>
-            <div>
-              <div className="text-[10px] text-slate-400 uppercase tracking-wider">Net P&L</div>
-              <div className={`text-lg font-bold tabular-nums ${previewPnl >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
-                {previewPnl >= 0 ? "+" : "-"}${Math.abs(previewPnl).toFixed(2)}
-              </div>
-            </div>
-            <div>
-              <div className="text-[10px] text-slate-400 uppercase tracking-wider">R:R</div>
-              <div className="text-lg font-bold text-slate-200 tabular-nums">
-                {previewRR ? `1:${previewRR.toFixed(1)}` : "—"}
-              </div>
-            </div>
-            <div>
-              <div className="text-[10px] text-slate-400 uppercase tracking-wider">Risk</div>
-              <div className="text-lg font-bold text-rose-300 tabular-nums">
-                {previewRisk !== null ? `$${previewRisk.toFixed(2)}` : "—"}
-              </div>
-            </div>
-            <div>
-              <div className="text-[10px] text-slate-400 uppercase tracking-wider">Comm.</div>
-              <div className="text-lg font-bold text-slate-300 tabular-nums">
-                {form.commission ? `$${form.commission.toFixed(2)}` : "$0"}
-              </div>
-            </div>
-          </div>
+          {renderPreview()}
 
           <div className="flex gap-3 pt-2">
             <button type="button" onClick={onClose} className="flex-1 py-2.5 rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800">

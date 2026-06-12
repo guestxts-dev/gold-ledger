@@ -27,7 +27,7 @@ const strategies = [
   "Rounding Bottom",
   "Other",
 ];
-const emotions = ["calm", "confident", "fomo", "fearful", "revenge", "disciplined", "Bot", "Personal", "Aba Trades", "Apex", "Coffie", "UpDown"];
+const emotions = ["Calm", "Confident", "Fomo", "Fearful", "Revenge", "Disciplined", "Bot", "Personal", "Aba Trades", "Apex Fx", "Coffie Fx", "UpDown Fx"];
 
 function rand<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
